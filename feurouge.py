@@ -2,14 +2,16 @@ import cv2 as cv
 import numpy as np
 
 a=0
-
 src = cv.VideoCapture(0)
 while(src.isOpened()):
     ret, frame = src.read()
+    #height = np.size(frame,0)
+    #width = np.size(frame,1)
+    #print(height,width)
     hsv = cv.cvtColor(frame,cv.COLOR_BGR2HSV)
-    low_hsv=np.array([0,150,50])
+    low_hsv=np.array([0,80,50])
     high_hsv=np.array([3,255,220])
-    low_hsv2=np.array([170,150,50])
+    low_hsv2=np.array([170,80,50])
     high_hsv2=np.array([180,255,220])
     mask=cv.inRange(hsv,lowerb=low_hsv,upperb=high_hsv)
     mask2=cv.inRange(hsv,lowerb=low_hsv2,upperb=high_hsv2)
@@ -27,17 +29,20 @@ while(src.isOpened()):
 
     for i in contours:
         x,y,w,h=cv.boundingRect(i)
-        if  1.0<=w/h:
-            if w*h<800:
+        if  (240<y)&(y+h+w<400) :
+            if w*h<200:
                 pass
             else:
-                print("red detected")
                 a+=1
                 img=frame[y:y+h,x:x+w]
             
                 img=cv.resize(img,(500,460))
                 cv.rectangle(frame,(x-5,y-5),(x+w+5,y+h+5),(0,255,0),2)
-                cv.putText(frame, "Red light detected", (x,y+w+10), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+                print(w*h)
+                if(w*h < 400):
+                    cv.putText(frame, "Red light", (x,y+w+10), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+                if(w*h >= 400):
+                    cv.putText(frame, "Traffic sign", (x,y+w+10), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
             
                 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
                 ret, thresh = cv.threshold(gray, 70, 255, cv.THRESH_BINARY_INV)
@@ -53,7 +58,8 @@ while(src.isOpened()):
                 #list1 = np.array([[point1, point2, point3, point4]], dtype=np.int32)
                 #mask = np.zeros_like(gray)
                # mask = cv.fillConvexPoly(mask, list1, 255)
-           
+    cv.line(frame, (0, 240), (640, 240), (0, 255, 0), 1, 4)
+    cv.line(frame, (0, 400), (640, 400), (0, 255, 0), 1, 4)        
     cv.imshow('frame',frame)
     if cv.waitKey(1) & 0xFF == ord('q'):
             break
