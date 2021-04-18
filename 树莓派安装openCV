@@ -1,0 +1,105 @@
+第一：安装OpenCV所依赖的各种工具和图像视频库
+
+// 软件源更新
+sudo apt-get update 
+
+// 升级本地所有安装包，版本过高反而需要降级才能安装
+sudo apt-get upgrade
+
+// 升级树莓派固件
+sudo rpi-update
+
+// 安装build-essential、cmake、git和pkg-config
+sudo apt-get install build-essential cmake git pkg-config 
+
+// 安装jpeg格式图像工具包
+sudo apt-get install libjpeg8-dev 
+
+// 安装tif格式图像工具包
+sudo apt-get install libtiff5-dev 
+
+// 安装JPEG-2000图像工具包
+sudo apt-get install libjasper-dev 
+
+// 安装png图像工具包
+sudo apt-get install libpng12-dev
+
+//安装视频I/O包
+sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+
+//安装gtk2.0（树莓派很可能下载错误，更换中科大或者清华源即可） 
+sudo apt-get install libgtk2.0-dev
+
+//优化函数包
+sudo apt-get install libatlas-base-dev gfortran
+
+
+第二：开始编译OpenCV源代码
+这一步耗时最久，我大概用了五个小时吧
+保持供电稳定
+有时候在某一步卡很久，耐心等就好了
+我用的vnc连接的
+过程中又一次vnc断了
+不过重新连接就好了
+编译过程没有断
+
+// 下载OpenCV
+wget -O opencv-3.4.3.zip https://github.com/Itseez/opencv/archive/3.4.3.zip
+
+// 解压OpenCV
+unzip opencv-3.4.3.zip
+
+// 下载OpenCV_contrib库：
+wget -O opencv_contrib-3.4.3.zip https://github.com/Itseez/opencv_contrib/archive/3.4.3.zip
+
+// 解压OpenCV_contrib库：
+unzip opencv_contrib-3.4.3.zip
+
+（这里要是解压不了，用
+jar xvf opencv_contrib-3.4.3.zip
+此命令来解压）
+
+// 打开源码文件夹，这里以3.4.3为例
+cd opencv-3.4.3
+
+// 新建release文件夹
+mkdir release
+
+// 进入release文件夹
+cd release
+
+//* CMAKE_BUILD_TYPE是编译方式
+* CMAKE_INSTALL_PREFIX是安装目录
+* OPENCV_EXTRA_MODULES_PATH是加载额外模块
+* INSTALL_PYTHON_EXAMPLES是安装官方python例程
+* BUILD_EXAMPLES是编译例程  **/
+
+//这五行直接复制，回车
+sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
+	-D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.4.3/modules \
+    -D INSTALL_PYTHON_EXAMPLES=ON \
+    -D BUILD_EXAMPLES=ON ..
+    
+//编译
+sudo make
+
+// 安装
+sudo make install
+
+// 更新动态链接库
+sudo ldconfig
+
+第三：完成编译，进行测试，可以打开Python的IDE进行测试，也可以在终端输入Python3，回车然后再输入import cv2，如果有跳到下一行没有报错，说明成功安装
+
+import numpy as np
+import cv2
+
+#读取一张图片
+img = cv2.imread("/home/pi/dxw/image_src/test1.jpg")
+#窗口命名
+cv2.namedWindow("image")
+#显示图片
+cv2.imshow("image",img)
+cv2.waitKey(0)
+cv2.destroyAllWindow()
